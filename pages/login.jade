@@ -1,0 +1,41 @@
+doctype html
+html
+	head
+		title= title
+		link(rel='stylesheet', href='/styles/main.css')
+	body#LoginPage
+	.container
+		form.form-horizontal.form-signin(role='form' action='/login' method='POST')
+			h2.form-signin-heading Please sign in
+			div.form-group
+				label.col-sm-2.control-label(for='username') Username
+				div.col-sm-10
+					input.form-control#username(
+						type='username',
+						placeholder='Username'
+						name='username'
+						required='',
+						autofocus=''
+					)
+			div.form-group
+				label.col-sm-2.control-label(for='password') Password
+				div.col-sm-10
+					input.form-control#password(
+						type='password',
+						placeholder='Password'
+						name='password'
+						required=''
+					)
+			div.form-group
+				div.col-sm-offset-2.col-sm-10
+					div.checkbox
+						label
+							input(type='checkbox', name='remember', value='yes')
+							| Remember Me
+			div.form-group
+				div.col-sm-offset-2.col-sm-10
+					button.btn.btn-lg.btn-primary.btn-block(type='submit') Sign in
+
+		#message
+		if message
+			h1.text-center.error-message #{message}
