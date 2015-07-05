@@ -4,14 +4,16 @@ var $ = window.jQuery;
 var Button = require('react-bootstrap').Button;
 var ContractStore = require('../stores/ContractStore');
 var ContractEditDialog = require('../components/ContractEditDialog');
+var ContractDeleteConfirmation = require('../components/ContractDeleteConfirmation');
 
 var ContractsView = React.createClass({
 	getInitialState: function() {
 		return {
-			contracts: [],
 			remove_disabled: true,
-			contractEditData: {},
-			showContractEditDialog: false
+			editData: {},
+			deleteData: [],
+			showEditDialog: false,
+			showDeleteConfirmation: false
 		};
 	},
 	componentWillUnmount: function() {
@@ -19,7 +21,7 @@ var ContractsView = React.createClass({
 		$table.off('check.bs.table uncheck.bs.table ' +
 			'check-all.bs.table uncheck-all.bs.table', this._countCheckbox.bind(this));
 		$table.bootstrapTable('destroy');
-		ContractStore.removeChangeHandler(this._onChange);
+		ContractStore.removeChangeHandler(this._onDataChange);
 	},
 	componentDidMount: function() {
 		var $table = $(this.refs.table.getDOMNode());
@@ -56,10 +58,7 @@ var ContractsView = React.createClass({
 		$table.on('check.bs.table uncheck.bs.table ' +
 			'check-all.bs.table uncheck-all.bs.table', this._countCheckbox);
 
-		ContractStore.addChangeListener(this._onChange);
-	},
-	componentDidUpdate: function() {
-		$(this.refs.table.getDOMNode()).bootstrapTable('load', this.state.contracts);
+		ContractStore.addChangeListener(this._onDataChange);
 	},
 	render: function() {
 		return (
@@ -84,42 +83,55 @@ var ContractsView = React.createClass({
 					<table ref="table" />
 				</div>
 				<ContractEditDialog
-					show={this.state.showContractEditDialog}
-					contractData={this.state.contractEditData}
-					onClose={this._closeDialog} />
+					show={this.state.showEditDialog}
+					contractData={this.state.editData}
+					onClose={this._closeEditDialog} />
+				<ContractDeleteConfirmation
+					show={this.state.showDeleteConfirmation}
+					contractData={this.state.deleteData}
+					onClose={this._closeDeleteConfirmation} />
 			</div>
 		);
 	},
-	_openNewDialog: function(e, value, contract) {
+	_openNewDialog: function() {
 		this.setState({
-			showContractEditDialog: true,
-			contractEditData: {}
+			showEditDialog: true,
+			editData: {}
 		});
 	},
 	_openEditDialog: function(e, value, contract) {
 		this.setState({
-			showContractEditDialog: true,
-			contractEditData: contract
+			showEditDialog: true,
+			editData: contract
 		});
 	},
-	_closeDialog: function() {
+	_openDeleteDialog: function() {
 		this.setState({
-			showContractEditDialog: false,
-			contractEditData: {}
+			showDeleteConfirmation: true,
+			deleteData: $(this.refs.table.getDOMNode()).bootstrapTable('getSelections')
+		});
+	},
+	_closeDeleteConfirmation: function() {
+		this.setState({
+			showDeleteConfirmation: false,
+			deleteData: []
+		});
+	},
+	_closeEditDialog: function() {
+		this.setState({
+			showEditDialog: false,
+			editData: {}
 		});
 	},
 	_formatEditButton: function() {
 		return '<button type="button" class="btn btn-primary btn-xs edit-contract">Edit</button>';
 	},
-	_onChange: function(type) {
-		this.setState({
-			contracts: ContractStore.getContracts()
-		});
+	_onDataChange: function() {
+		$(this.refs.table.getDOMNode()).bootstrapTable('load', ContractStore.getContracts());
 	},
 	_countCheckbox: function() {
-		var disabled = ($(this.refs.table.getDOMNode()).bootstrapTable('getSelections').length === 0);
 		this.setState({
-			remove_disabled: disabled
+			remove_disabled: ($(this.refs.table.getDOMNode()).bootstrapTable('getSelections').length === 0)
 		});
 	}
 });
