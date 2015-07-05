@@ -1,23 +1,36 @@
 var React = require('react');
-var Bootstrap = require('react-bootstrap');
-var Navbar = Bootstrap.Navbar;
+var Navbar = require('react-bootstrap').Navbar;
+var Button = require('react-bootstrap').Button;
+
 var PortfolioDropdownComponent = require('../components/PortfolioDropdown');
 var NewPortfolioDialog = require('../components/NewPortfolioDialog');
+var PortfolioDeleteConfirmation = require('../components/PortfolioDeleteConfirmation');
 
 var NavBarComponent = React.createClass({
 	getInitialState: function() {
 		return {
-			showNewPortfolioDialog: false
+			showNewDialog: false,
+			showDeleteConfirmation: false
 		};
 	},
-	_openDialog: function() {
+	_openNewDialog: function() {
 		this.setState({
-			showNewPortfolioDialog: true
+			showNewDialog: true
 		});
 	},
-	_closeDialog: function() {
+	_closeNewDialog: function() {
 		this.setState({
-			showNewPortfolioDialog: false
+			showNewDialog: false
+		});
+	},
+	_openDeleteConfirmation: function() {
+		this.setState({
+			showDeleteConfirmation: true
+		});
+	},
+	_closeDeleteConfirmation: function() {
+		this.setState({
+			showDeleteConfirmation: false
 		});
 	},
 	onLogoutClicked: function() {
@@ -44,13 +57,18 @@ var NavBarComponent = React.createClass({
 	  					<div className="form-group" id="portfolio-select-container">
 	  						<PortfolioDropdownComponent/>
 	  					</div>
-						<button
-							type="button"
-							className="btn btn-primary"
-							id="create-portfolio"
-							onClick={this._openDialog}>
-							<span className="glyphicon glyphicon-plus" aria-hidden="true" />
-						</button>
+						<Button
+							bsStyle='primary'
+							id='create-portfolio'
+							onClick={this._openNewDialog}>
+							<i className="glyphicon glyphicon-plus"></i>
+						</Button>
+						<Button
+							bsStyle='danger'
+							id='delete-portfolio'
+							onClick={this._openDeleteConfirmation}>
+							<i className="glyphicon glyphicon-remove"></i>
+						</Button>
 					</form>
 					<form className="navbar-form navbar-right">
 						<div className="logout-button" onClick={this.onLogoutClicked}>
@@ -60,8 +78,11 @@ var NavBarComponent = React.createClass({
 					</form>
 				</div>
 				<NewPortfolioDialog
-					show={this.state.showNewPortfolioDialog}
-					onClose={this._closeDialog} />
+					show={this.state.showNewDialog}
+					onClose={this._closeNewDialog} />
+				<PortfolioDeleteConfirmation
+					show={this.state.showDeleteConfirmation}
+					onClose={this._closeDeleteConfirmation} />
 			</div>
 		);
 	}

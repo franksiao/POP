@@ -5,14 +5,6 @@ var assign = require('object-assign');
 
 var _portfolios = [];
 
-function _portfoliosByIds() {
-	var formatted = {};
-	_portfolios.forEach(function(portfolio) {
-		formatted[portfolio.id] = portfolio;
-	});
-	return formatted;
-}
-
 var _currentPortfolioId = null;
 
 var PortfolioStore = assign({}, EventEmitter.prototype, {
@@ -20,7 +12,11 @@ var PortfolioStore = assign({}, EventEmitter.prototype, {
 		return _portfolios;
 	},
 	getPortfolioMap: function() {
-		return _portfoliosById();
+		var formatted = {};
+		_portfolios.forEach(function(portfolio) {
+			formatted[portfolio.id] = portfolio;
+		});
+		return formatted;
 	},
 	getCurrentPortfolioId: function() {
 		return _currentPortfolioId;
@@ -40,7 +36,12 @@ PortfolioStore.dispatchToken = Dispatcher.register(function(message) {
 	switch(message.type) {
 		case Constants.UPDATE_PORTFOLIOS:
 			_portfolios = message.value;
-			if (!_currentPortfolioId && _portfolios.length > 0) {
+			var map = PortfolioStore.getPortfolioMap();
+			//we want to update the current portfolio id if
+			//during initial load and the current id hasnt been set yet or
+			//if the current id has been deleted which is the second condition here
+			if ((!_currentPortfolioId && _portfolios.length > 0) ||
+				(_currentPortfolioId && !map[_currentPortfolioId] && _portfolios.length)) {
 				_currentPortfolioId = _portfolios[0].id;
 				PortfolioStore.emit(Constants.UPDATE_CURRENT_PORTFOLIO_ID, _currentPortfolioId);
 			}

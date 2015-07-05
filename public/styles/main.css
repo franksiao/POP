@@ -7700,6 +7700,9 @@ fieldset[disabled] .btn-danger.active {
 #HomePage .button-toolbar button {
   margin-right: 5px;
 }
+#HomePage #create-portfolio {
+  margin-right: 5px;
+}
 #HomePage #PortfolioContent {
   margin-top: 70px;
 }
