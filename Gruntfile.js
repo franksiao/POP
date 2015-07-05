@@ -4,7 +4,7 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     concurrent: {
         target: {
-            tasks: ['nodemon', 'watch'],
+            tasks: ['watch','nodemon'],
             options: {
                 logConcurrentOutput: true
             }
@@ -12,8 +12,11 @@ module.exports = function(grunt) {
     },
     watch: {
       scripts: {
-        files: ['public/js/*'],
-        tasks: ['browserify']
+        files: ['public/js/**/*', '!public/js/home/bundle.js'],
+        tasks: ['browserify'],
+        options: {
+          spawn: false
+        }
       },
       styles: {
         files: ['public/styles/*.less'], // which files to watch
@@ -25,21 +28,30 @@ module.exports = function(grunt) {
     },
     browserify: {
       dist: {
+        options: {
+          browserifyOptions: {
+            transform: [[ 'reactify', {'es6': true} ]],
+            debug: true
+          }
+        },
         files: {
-          'public/js/home/bundle.js': ['public/js/home/main.js'],
+          'public/js/home/bundle.js': ['public/js/home/main.js']
         }
       }
     },
     nodemon: {
       dev: {
-        script: 'index.js'
+        script: 'index.js',
+        delayTime: 1
       }
     },
     less: {
       development: {
         options: {
-          compress: true,
-          yuicompress: true,
+          compress: false,
+          sourceMap: false,
+          sourceMapFilename: "main.css.map",
+          yuicompress: false,
           optimization: 2
         },
         files: {

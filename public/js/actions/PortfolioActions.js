@@ -1,30 +1,67 @@
-var PopDispatcher = require('../dispatcher/PopDispatcher');
-// var $ = require('jquery');
 var $ = window.jQuery;
+var Dispatcher = require('../dispatcher/Dispatcher');
+var Constants = require('../constants/Constants');
+var PortfolioStore = require('../stores/PortfolioStore');
 
-var PortfolioActions = {
-	getPortfolios: function() {
-		$.ajax({
-			url: 'portfolio',
-			type: 'GET'
-		}).done(function(response) {
-			PopDispatcher.dispatch({
-				type: 'get_portfolios',
-				response: response.data
-			});
-		}).fail(function(err) {
-			PopDispatcher.dispatch({
-				type: 'get_portfolios',
-				response: 'failed'
-			});
+function fetchPortfolios(currentPortfolioId) {
+	$.ajax({
+		url: 'portfolio',
+		type: 'GET'
+	}).done(function(response) {
+		Dispatcher.dispatch({
+			type: Constants.UPDATE_PORTFOLIOS,
+			value: response.data
 		});
-	},
-	setCurrentPortfolioId: function(id) {
-		PopDispatcher.dispatch({
-			type: 'set_current_portfolio_id',
+		if (currentPortfolioId) {
+			Dispatcher.dispatch({
+				type: Constants.UPDATE_CURRENT_PORTFOLIO_ID,
+				value: currentPortfolioId
+			});
+		}
+	}).fail(console.error);
+}
+function createPortfolio(name) {
+	$.ajax({
+		url: 'portfolio',
+		type: 'POST',
+		data: {name: name}
+	}).done(function(response) {
+		fetchPortfolios(response.data.id);
+	}).fail(console.err);
+}
+function updatePortfolio(portfolio) {
+	$.ajax({
+		url: 'portfolio',
+		type: 'PUT',
+		data: portfolio
+	}).done(function(response) {
+		fetchPortfolios();
+	}).fail(console.err);
+}
+
+function removePortfolio(id) {
+	$.ajax({
+		url: 'portfolio',
+		type: 'DELETE',
+		data: {
 			id: id
-		});
-	}
-};
+		}
+	}).done(function(response) {
+		fetchPortfolios();
+	}).fail(console.err);
+}
 
-module.exports = PortfolioActions;
+function updateCurrentPortfolioId(id) {
+	Dispatcher.dispatch({
+		type: Constants.UPDATE_CURRENT_PORTFOLIO_ID,
+		value: id
+	});
+}
+
+module.exports = {
+	fetch: fetchPortfolios,
+	create: createPortfolio,
+	update: updatePortfolio,
+	remove: removePortfolio,
+	updateCurrentId: updateCurrentPortfolioId
+};

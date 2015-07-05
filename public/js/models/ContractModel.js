@@ -1,80 +1,76 @@
 var $ = window.jQuery;
-var _ = require('underscore');
-var RSVP = require('rsvp');
+var Dispatcher = require('../dispatcher/Dispatcher');
+var Constants = require('../constants/Constants');
+var PortfolioStore = require('../stores/PortfolioStore');
 
-function putContract(portfolioId, contract) {
-	return (new RSVP.Promise(function(resolve, reject) {
-		contract.portfolio_id = portfolioId;
-		$.ajax({
-			url: 'contract',
-			type: 'PUT',
-			data: contract
-		}).done(function() {
-			resolve();
-		}).fail(function(err) {
-			reject(err);
-		});
-	}));
-}
-function deleteContract(portfolioId, contractIds) {
-	return (new RSVP.Promise(function(resolve, reject) {
-		$.ajax({
-			url: 'contract',
-			type: 'DELETE',
-			data: {id: contractIds, portfolio_id: portfolioId}
-		}).done(function() {
-			resolve();
-		}).fail(function(err) {
-			reject(err);
-		});
-	}));
-}
+//external dependency
+PortfolioStore.addChangeListener(fetchContracts, Constants.UPDATE_CURRENT_PORTFOLIO_ID);
 
-function postContract(portfolioId, contract) {
-	return (new RSVP.Promise(function(resolve, reject) {
-		contract.portfolio_id = portfolioId
-		$.ajax({
-			url: 'contract',
-			type: 'POST',
-			data: contract
-		}).done(function() {
-			resolve();
-		}).fail(function(err) {
-			reject(err);
-		});
-	}));
-}
-
-_contractsByPortfolioIds = {};
-function getContractsByPortfolio(portfolioId, refetch) {
-	if (!refetch && _contractsByPortfolioIds[portfolioId]) {
-		return RSVP.Promise.resolve(_contractsByPortfolioIds[portfolioId]);
-	}
-	return (new RSVP.Promise(function(resolve, reject) {
-		$.ajax({
-			url: 'contract',
-			type: 'GET',
-			data: {portfolio_id: portfolioId}
-		}).done(function(response) {
-			_contractsByPortfolioIds[portfolioId] = _formatContracts(response.data);
-			resolve(_contractsByPortfolioIds[portfolioId]);
-		}).fail(function(err) {
-			reject(err);
-		});
-	}));
-}
-
-function _formatContracts(data) {
-	var formattedContracts = {};
-	data.forEach(function(contract) {
-		formattedContracts[contract.id] = contract;
+function updateContract(contract) {
+	contract.portfolio_id = PortfolioStore.getCurrentPortfolioId();
+	$.ajax({
+		url: 'contract',
+		type: 'PUT',
+		data: contract
+	}).done(function() {
+		fetchContracts(true);
+	}).fail(function(err) {
+		console.log(err);
 	});
-	return formattedContracts;
+}
+function removeContract(contractIds) {
+	var portfolioId = PortfolioStore.getCurrentPortfolioId();
+	$.ajax({
+		url: 'contract',
+		type: 'DELETE',
+		data: {id: contractIds, portfolio_id: portfolioId}
+	}).done(function() {
+		fetchContracts(true);
+	}).fail(function(err) {
+		console.log(err);
+	});
 }
 
-module.exports {
-	getContractsByPortfolio: getContractsByPortfolio,
-	deleteContract: deleteContract,
-	postContract: postContract,
-	putContract: putContract
+function createContract(contract) {
+	contract.portfolio_id = PortfolioStore.getCurrentPortfolioId();
+	$.ajax({
+		url: 'contract',
+		type: 'POST',
+		data: contract
+	}).done(function() {
+		fetchContracts(true);
+	}).fail(function(err) {
+		console.log(err);
+	});
+}
+
+var _contractsByPortfolioIds = {};
+function fetchContracts(refetch) {
+	var portfolioId = PortfolioStore.getCurrentPortfolioId();
+	if (!refetch && _contractsByPortfolioIds[portfolioId]) {
+		Dispatcher.dispatch({
+			type: Constants.UPDATE_CONTRACTS,
+			value: _contractsByPortfolioIds[portfolioId]
+		});
+	}
+	$.ajax({
+		url: 'contract',
+		type: 'GET',
+		data: {portfolio_id: portfolioId}
+	}).done(function(response) {
+		_contractsByPortfolioIds[portfolioId] = response.data;
+		Dispatcher.dispatch({
+			type: Constants.UPDATE_CONTRACTS,
+			value: response.data
+		});
+	}).fail(function(err) {
+		console.error(err);
+	});
+}
+
+module.exports = {
+	fetch: fetchContracts,
+	remove: removeContract,
+	create: createContract,
+	update: updateContract
 };

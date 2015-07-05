@@ -107,7 +107,7 @@ function _formatConstraints(data) {
 	return formattedConstraints;
 }
 
-module.exports {
+module.exports = {
 	postConstraint: postConstraint,
 	putConstraint: putConstraint,
 	getConstraintsByPortfolio: getConstraintsByPortfolio,

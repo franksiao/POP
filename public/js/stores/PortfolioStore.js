@@ -1,9 +1,18 @@
-var PopDispatcher = require('../dispatcher/PopDispatcher');
+var Dispatcher = require('../dispatcher/Dispatcher');
+var Constants = require('../constants/Constants');
 var EventEmitter = require('events').EventEmitter;
 var assign = require('object-assign');
 
 var _portfolios = [];
-var _portfolioMap = {};
+
+function _portfoliosByIds() {
+	var formatted = {};
+	_portfolios.forEach(function(portfolio) {
+		formatted[portfolio.id] = portfolio;
+	});
+	return formatted;
+}
+
 var _currentPortfolioId = null;
 
 var PortfolioStore = assign({}, EventEmitter.prototype, {
@@ -11,7 +20,7 @@ var PortfolioStore = assign({}, EventEmitter.prototype, {
 		return _portfolios;
 	},
 	getPortfolioMap: function() {
-		return _portfolioMap;
+		return _portfoliosById();
 	},
 	getCurrentPortfolioId: function() {
 		return _currentPortfolioId;
@@ -19,36 +28,33 @@ var PortfolioStore = assign({}, EventEmitter.prototype, {
 	setCurrentPortfolioId: function(id) {
 		_currentPortfolioId = id;
 	},
-	addChangeListener: function(callback){
-		this.addListener('change', callback);
+	addChangeListener: function(callback, type) {
+		this.addListener(type || Constants.ALL, callback);
 	},
-	removeChangeListener: function(callback) {
-		this.removeListener('change', callback);
-	},
-	emitChange: function(messages){
-		this.emit('change', messages);
+	removeChangeListener: function(callback, type) {
+		this.removeListener(type || Constants.ALL, callback);
 	}
 });
 
-PortfolioStore.dispatchToken = PopDispatcher.register(function(request) {
-	switch(request.type) {
-		case 'get_portfolios':
-			_portfolios = request.response;
-			_portfolioMap = {};
+PortfolioStore.dispatchToken = Dispatcher.register(function(message) {
+	switch(message.type) {
+		case Constants.UPDATE_PORTFOLIOS:
+			_portfolios = message.value;
 			if (!_currentPortfolioId && _portfolios.length > 0) {
 				_currentPortfolioId = _portfolios[0].id;
+				PortfolioStore.emit(Constants.UPDATE_CURRENT_PORTFOLIO_ID, _currentPortfolioId);
 			}
-			_portfolios.forEach(function(port) {
-				_portfolioMap[port.id] = port;
-			});
+			PortfolioStore.emit(Constants.UPDATE_PORTFOLIOS, _portfolios);
 			break;
-		case 'set_current_portfolio_id':
-			_currentPortfolioId = request.id;
+		case Constants.UPDATE_CURRENT_PORTFOLIO_ID:
+			if (_currentPortfolioId !== message.value) {
+				_currentPortfolioId = message.value;
+				PortfolioStore.emit(Constants.UPDATE_CURRENT_PORTFOLIO_ID, _currentPortfolioId);
+			}
 			break;
 		default:
-			//no op
 	}
-	PortfolioStore.emitChange();
+	PortfolioStore.emit(Constants.ALL);
 	return true;
 });
 

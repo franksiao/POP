@@ -17,6 +17,6 @@ function getGeographiesByPortfolio(portfolioId) {
 	}));
 }
 
-module.exports {
+module.exports = {
 	getGeographiesByPortfolio: getGeographiesByPortfolio
 };

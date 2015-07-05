@@ -38,8 +38,8 @@ var PortfolioDropdownComponent = React.createClass({
 			</div>
 		);
 	},
-	_onCurrentPortfolioChange: function(val) {
-		PortfolioActions.setCurrentPortfolioId(val);
+	_onCurrentPortfolioChange: function(id) {
+		PortfolioActions.updateCurrentId(id);
 	},
 	_onChange: function() {
 		this.setState({

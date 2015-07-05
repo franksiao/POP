@@ -5,7 +5,7 @@ var PortfolioStore = require('../stores/PortfolioStore');
 var PortfolioActions = require('../actions/PortfolioActions');
 
 var DialogActions = {
-	open: function() {
+	openNewPortfolio: function() {
 		BootstrapDialog.confirm({
 			title: 'Set Portfolio Name',
 			message: function(dialog) {
