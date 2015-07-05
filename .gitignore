@@ -35,3 +35,4 @@ config.json
 
 sessions
 uploads
+public/js/home/bundle.js
