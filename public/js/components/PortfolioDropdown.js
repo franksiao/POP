@@ -1,8 +1,8 @@
 var React = require('react');
 var Select = require('react-select');
 
-var PortfolioStore = require('../stores/PortfolioStore');
-var PortfolioActions = require('../actions/PortfolioActions');
+var PortfolioStore = require('stores/PortfolioStore');
+var PortfolioActions = require('actions/PortfolioActions');
 
 var PortfolioDropdownComponent = React.createClass({
 	getInitialState: function() {

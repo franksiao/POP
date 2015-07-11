@@ -4,7 +4,7 @@ var Bootstrap = require('react-bootstrap');
 var Button = Bootstrap.Button;
 var Modal = Bootstrap.Modal;
 
-var PortfolioActions = require('../actions/PortfolioActions');
+var PortfolioActions = require('actions/PortfolioActions');
 
 var NewPortfolioDialog = React.createClass({
 	getInitialState: function() {

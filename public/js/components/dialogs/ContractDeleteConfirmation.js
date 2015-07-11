@@ -4,7 +4,7 @@ var _ = require('underscore');
 var Bootstrap = require('react-bootstrap');
 var Button = Bootstrap.Button;
 var Modal = Bootstrap.Modal;
-var ContractActions = require('../actions/ContractActions');
+var ContractActions = require('actions/ContractActions');
 
 var ContractDeleteConfirmation = React.createClass({
 	delete: function() {

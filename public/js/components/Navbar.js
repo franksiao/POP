@@ -2,9 +2,9 @@ var React = require('react');
 var Navbar = require('react-bootstrap').Navbar;
 var Button = require('react-bootstrap').Button;
 
-var PortfolioDropdownComponent = require('../components/PortfolioDropdown');
-var NewPortfolioDialog = require('../components/NewPortfolioDialog');
-var PortfolioDeleteConfirmation = require('../components/PortfolioDeleteConfirmation');
+var PortfolioDropdownComponent = require('components/PortfolioDropdown');
+var NewPortfolioDialog = require('components/dialogs/NewPortfolioDialog');
+var PortfolioDeleteConfirmation = require('components/dialogs/PortfolioDeleteConfirmation');
 
 var NavBarComponent = React.createClass({
 	getInitialState: function() {

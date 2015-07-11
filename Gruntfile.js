@@ -31,7 +31,8 @@ module.exports = function(grunt) {
         options: {
           browserifyOptions: {
             transform: [[ 'reactify', {'es6': true} ]],
-            debug: true
+            debug: true,
+            paths: ['./node_modules','./public/js']
           }
         },
         files: {

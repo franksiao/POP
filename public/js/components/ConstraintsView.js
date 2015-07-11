@@ -2,11 +2,15 @@ var React = require('react');
 var $ = window.jQuery;
 
 var Button = require('react-bootstrap').Button;
-var ContractStore = require('stores/ContractStore');
-var ContractEditDialog = require('components/dialogs/ContractEditDialog');
-var ContractDeleteConfirmation = require('components/dialogs/ContractDeleteConfirmation');
+var ConstraintStore = require('stores/ConstraintStore');
+var ConstraintActions = require('actions/ConstraintActions');
+var GeographyActions = require('actions/GeographyActions');
 
-var ContractsView = React.createClass({
+
+var ConstraintEditDialog = require('components/dialogs/ConstraintEditDialog');
+// var ConstraintDeleteConfirmation = require('../components/ConstraintDeleteConfirmation');
+
+var ConstraintsView = React.createClass({
 	getInitialState: function() {
 		return {
 			remove_disabled: true,
@@ -21,7 +25,7 @@ var ContractsView = React.createClass({
 		$table.off('check.bs.table uncheck.bs.table ' +
 			'check-all.bs.table uncheck-all.bs.table', this._countCheckbox.bind(this));
 		$table.bootstrapTable('destroy');
-		ContractStore.removeChangeHandler(this._onDataChange);
+		ConstraintStore.removeChangeHandler(this._onDataChange);
 	},
 	componentDidMount: function() {
 		var $table = $(this.refs.table.getDOMNode());
@@ -29,7 +33,7 @@ var ContractsView = React.createClass({
 			height: 460,
 			search: true,
 			pagination: false,
-			toolbar: '#contract-button-toolbar',
+			toolbar: '#constraint-button-toolbar',
 			columns: [
 				{
 					field: 'checked',
@@ -41,15 +45,25 @@ var ContractsView = React.createClass({
 					sortable: true
 				},
 				{
-					field: 'return_value',
-					title: 'Return',
+					field: 'target_return',
+					title: 'Target Return',
+					sortable: true
+				},
+				{
+					field: 'target_tvar_threshold',
+					title: 'Target tVar Threshold',
+					sortable: true
+				},
+				{
+					field: 'total_size',
+					title: 'Size',
 					sortable: true
 				},
 				{
 					title: '',
 					formatter: this._formatEditButton,
 					events: {
-						'click .edit-contract': this._openEditDialog
+						'click .edit-constraint': this._openEditDialog
 					}
 				}
 			]
@@ -58,13 +72,13 @@ var ContractsView = React.createClass({
 		$table.on('check.bs.table uncheck.bs.table ' +
 			'check-all.bs.table uncheck-all.bs.table', this._countCheckbox);
 
-		ContractStore.addChangeListener(this._onDataChange);
+		ConstraintStore.addChangeListener(this._onDataChange);
 	},
 	render: function() {
 		return (
-			<div id="ContractsView">
-				<h3>Contracts</h3>
-				<div id="contract-button-toolbar" className="button-toolbar">
+			<div id="ConstraintsView">
+				<h3>Constraints</h3>
+				<div id="constraint-button-toolbar" className="button-toolbar">
 					<Button
 						bsStyle='primary'
 						bsSize='small'
@@ -79,17 +93,13 @@ var ContractsView = React.createClass({
 						<i className="glyphicon glyphicon-remove"></i> Remove
 					</Button>
 				</div>
-				<div id="ContractsTable" className="container">
+				<div id="ConstraintsTable" className="container">
 					<table ref="table" />
 				</div>
-				<ContractEditDialog
+				<ConstraintEditDialog
 					show={this.state.showEditDialog}
-					contractData={this.state.editData}
+					constraintData={this.state.editData}
 					onClose={this._closeEditDialog} />
-				<ContractDeleteConfirmation
-					show={this.state.showDeleteConfirmation}
-					contractData={this.state.deleteData}
-					onClose={this._closeDeleteConfirmation} />
 			</div>
 		);
 	},
@@ -99,10 +109,10 @@ var ContractsView = React.createClass({
 			editData: {}
 		});
 	},
-	_openEditDialog: function(e, value, contract) {
+	_openEditDialog: function(e, value, constraint) {
 		this.setState({
 			showEditDialog: true,
-			editData: contract
+			editData: constraint
 		});
 	},
 	_openDeleteDialog: function() {
@@ -124,10 +134,10 @@ var ContractsView = React.createClass({
 		});
 	},
 	_formatEditButton: function() {
-		return '<button type="button" class="btn btn-primary btn-xs edit-contract">Edit</button>';
+		return '<button type="button" class="btn btn-primary btn-xs edit-constraint">Edit</button>';
 	},
 	_onDataChange: function() {
-		$(this.refs.table.getDOMNode()).bootstrapTable('load', ContractStore.getContracts());
+		$(this.refs.table.getDOMNode()).bootstrapTable('load', ConstraintStore.getConstraints());
 	},
 	_countCheckbox: function() {
 		this.setState({
@@ -136,4 +146,4 @@ var ContractsView = React.createClass({
 	}
 });
 
-module.exports = ContractsView;
+module.exports = ConstraintsView;

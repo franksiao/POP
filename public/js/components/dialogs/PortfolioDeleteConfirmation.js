@@ -4,8 +4,8 @@ var _ = require('underscore');
 var Bootstrap = require('react-bootstrap');
 var Button = Bootstrap.Button;
 var Modal = Bootstrap.Modal;
-var PortfolioActions = require('../actions/PortfolioActions');
-var PortfolioStore = require('../stores/PortfolioStore');
+var PortfolioActions = require('actions/PortfolioActions');
+var PortfolioStore = require('stores/PortfolioStore');
 
 var PortfolioDeleteConfirmation = React.createClass({
 	delete: function() {

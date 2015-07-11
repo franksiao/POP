@@ -4,8 +4,8 @@ var Bootstrap = require('react-bootstrap');
 var Button = Bootstrap.Button;
 var Modal = Bootstrap.Modal;
 
-var ContractForm = require('../components/ContractForm');
-var ContractActions = require('../actions/ContractActions');
+var ContractForm = require('components/forms/ContractForm/ContractForm');
+var ContractActions = require('actions/ContractActions');
 
 var ContractEditDialog = React.createClass({
 	save: function() {
