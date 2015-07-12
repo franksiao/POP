@@ -8,7 +8,7 @@ var GeographyActions = require('actions/GeographyActions');
 
 
 var ConstraintEditDialog = require('components/dialogs/ConstraintEditDialog');
-// var ConstraintDeleteConfirmation = require('../components/ConstraintDeleteConfirmation');
+var ConstraintDeleteConfirmation = require('components/dialogs/ConstraintDeleteConfirmation');
 
 var ConstraintsView = React.createClass({
 	getInitialState: function() {
@@ -100,6 +100,10 @@ var ConstraintsView = React.createClass({
 					show={this.state.showEditDialog}
 					constraintData={this.state.editData}
 					onClose={this._closeEditDialog} />
+				<ConstraintDeleteConfirmation
+					show={this.state.showDeleteConfirmation}
+					constraintData={this.state.deleteData}
+					onClose={this._closeDeleteConfirmation} />
 			</div>
 		);
 	},
